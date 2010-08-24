@@ -69,23 +69,15 @@ module XUnitContrib
 	end
 
 	def XUnitContrib.MakeAssemblyNamesVersionNeutral(path)
-		
 		latestVersion = XUnitContrib.GetLatestSupportedVersion(path)
+		MakeProjectAssemblyNamesVersionNeutral(path + RunnerProjectPath.gsub(VersionToken, latestVersion), "xunitcontrib.runner.resharper.runner", latestVersion)
+		MakeProjectAssemblyNamesVersionNeutral(path + ProviderProjectPath.gsub(VersionToken, latestVersion), "xunitcontrib.runner.resharper.provider", latestVersion)
+	end
 
-		runnerProject = Common.ReadAllFileText(path + RunnerProjectPath.gsub(VersionToken, latestVersion))
-		providerProject = Common.ReadAllFileText(path + ProviderProjectPath.gsub(VersionToken, latestVersion))
-		
-		oldRunnerAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.runner.#{latestVersion}</AssemblyName>"
-		oldProviderAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.provider.#{latestVersion}</AssemblyName>"
-		
-		newRunnerAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.runner</AssemblyName>"
-		newProviderAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.provider</AssemblyName>"
-		
-		runnerProject = runnerProject.gsub(oldRunnerAssemblyName, newRunnerAssemblyName)
-		providerProject = providerProject.gsub(oldProviderAssemblyName, newProviderAssemblyName)
-		
-		Common.WriteAllFileText(path + RunnerProjectPath.gsub(VersionToken, latestVersion), runnerProject)
-		Common.WriteAllFileText(path + ProviderProjectPath.gsub(VersionToken, latestVersion), providerProject)
+	def XUnitContrib.MakeProjectAssemblyNamesVersionNeutral(path, name, version)
+		project = Common.ReadAllFileText(path)
+		project = project.gsub("<AssemblyName>#{name}.#{version}</AssemblyName>", "<AssemblyName>#{name}</AssemblyName>")
+		Common.WriteAllFileText(path, project)
 	end
 
 	def XUnitContrib.DownloadSource(path)
