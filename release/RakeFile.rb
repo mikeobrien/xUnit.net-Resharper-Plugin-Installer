@@ -38,7 +38,6 @@ task :copyPluginFiles => :testXunitContrib do
 	Common.CleanPath(LibFolder)
 	Common.CopyFiles(XUnitContrib.GetPluginPath(TempFolder), LibFolder)
 	Common.CopyFiles(TempFolder + XUnitContrib::AnnotationsPath, LibFolder)
-	Common.CopyFiles(TempFolder + "*.ver", LibFolder)
 	Common.DeleteDirectory(TempFolder)
 end
 
