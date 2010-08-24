@@ -7,3 +7,4 @@ _ReSharper.*
 Temp
 temp
 xunitnetcontrib
+*.log
