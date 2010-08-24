@@ -3,17 +3,17 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
   <Product
-    Name='xUnit.net Resharper Plugin'
-    UpgradeCode='4B28EA3C-383A-488A-9984-F6D22FDEF90B'
-    Id='59B96BB8-68C6-44A3-B13E-51C9B1A21645'
+    Name='xUnit.net Resharper Plugin for R# v$(var.ResharperVersion)'
+    UpgradeCode='E7829487-6C36-4AAF-8585-36A2720B4E8C'
+    Id='9E8FA400-2541-43B3-AAEC-67D06D61227F'
     Language='1033'
     Manufacturer='Ultraviolet Catastrophe'
     Version='2.0'>
 
     <Package
         Keywords='Installer'
-			  Description="xUnit.net Resharper Plugin"
-			  Comments='xUnit.net Resharper Plugin'
+			  Description="xUnit.net Resharper Plugin for R# v$(var.ResharperVersion)"
+			  Comments='xUnit.net Resharper Plugin for R# v$(var.ResharperVersion)'
         Manufacturer='Ultraviolet Catastrophe'
 			  InstallerVersion='150'
         Languages='1033'
@@ -22,75 +22,53 @@
 
     <Property Id="ALLUSERS">1</Property>
 
-    <Property Id="NET_FRAMEWORK_INSTALLED">
-      <RegistrySearch Id='bebd761663' Type='raw'
-			  Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5' Name='Install' />
-    </Property>
-
-    <Condition Message=".NET Framework 3.5 is not installed. Please install it and try again.">
-      Installed OR (NET_FRAMEWORK_INSTALLED = "#1" AND NOT Installed)
-    </Condition>
-
     <Media Id='1' Cabinet='Installer.cab' EmbedCab='yes' />
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='Program Files'>
+        <Directory Id='af26709d9b' Name='JetBrains'>
+          <Directory Id='edf9425c02' Name='ReSharper'>
+            <Directory Id='a7aa91b14b' Name='v$(var.ResharperMajorVersion)'>
+              <Directory Id='d067703b35' Name='Bin'>
 
-        <Directory Id='INSTALLDIR' Name='Go Notification Interceptor'>
+                <Directory Id='ece8d7c2d8' Name='plugins'>
 
-          <Component Id="Application" Guid="4E50BF9B-FD9F-4304-AF18-92075E6E913D">
-            <File Id="ad4b8f87aa" Name="GoNotificationInterceptor.exe" DiskId="1" Source="..\Service\bin\Release\GoNotificationInterceptor.exe" Vital="yes" />
-            <File Id="b1f17608c5" Name="GoNotificationInterceptor.exe.config" DiskId="1" Source="..\Service\bin\Release\GoNotificationInterceptor.exe.config" Vital="yes" />
-            <File Id="a7f92fdfd4" Name="cses.smtp.server.dll" DiskId="1" Source="..\Service\bin\Release\cses.smtp.server.dll" Vital="yes" />
-            <File Id="cc08c9a423" Name="log4net.dll" DiskId="1" Source="..\Service\bin\Release\log4net.dll" Vital="yes" />
-            <File Id="d584708c51" Name="Magnum.dll" DiskId="1" Source="..\Service\bin\Release\Magnum.dll" Vital="yes" />
-            <File Id="e000a805b4" Name="Topshelf.dll" DiskId="1" Source="..\Service\bin\Release\Topshelf.dll" Vital="yes" />
-            <File Id="d54429451a" Name="Subject.xslt" DiskId="1" Source="..\Service\bin\Release\Subject.xslt" Vital="yes" />
-            <File Id="cb4bc27988" Name="Body.xslt" DiskId="1" Source="..\Service\bin\Release\Body.xslt" Vital="yes" />
+                  <Component Id="Plugin" Guid="8C5FB478-CE61-4E92-B5D7-B309B58EB8A1">
+                    <File Id="b059ffeffa" Name="xunitcontrib.runner.resharper.provider.dll" DiskId="1" Source="..\lib\xunitnetcontrib\xunitcontrib.runner.resharper.provider.dll" Vital="yes" />
+                    <File Id="a52a6aabcd" Name="xunitcontrib.runner.resharper.runner.dll" DiskId="1" Source="..\lib\xunitnetcontrib\xunitcontrib.runner.resharper.runner.dll" Vital="yes" />
+                    <File Id="c2ccec85a8" Name="xunit.runner.utility.dll" DiskId="1" Source="..\lib\xunitnetcontrib\xunit.runner.utility.dll" Vital="yes" />
+                    <File Id="d296b80a5b" Name="xunit.dll" DiskId="1" Source="..\lib\xunitnetcontrib\xunit.dll" Vital="yes" />
+                  </Component>
 
-            <util:XmlFile Id="b41d66a990" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@listenPort" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[LISTEN_PORT]"/>
-            <util:XmlFile Id="ca2e4aefda" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@smtpServer" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[SMTP_SERVER]"/>
-            <util:XmlFile Id="a4b9ff5ddf" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@smtpPort" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[SMTP_PORT]"/>
+                </Directory>
 
-            <ServiceInstall Id="e04fabf81e"
-                            Arguments="service"
-                            Name="GoNotificationInterceptor"
-                            DisplayName="Go Notification Interceptor"
-                            Type="ownProcess"
-                            Start="auto"
-                            ErrorControl="normal"
-                            Description="ThoughtWorks Go Notification Interceptor" />
-            <ServiceControl Id="c4a4212412"
-                            Name="GoNotificationInterceptor"
-                            Start="install"
-                            Wait="no" />
-            <ServiceControl Id="cd78281127"
-                            Name="GoNotificationInterceptor"
-                            Stop="both"
-                            Wait="yes"
-                            Remove="uninstall" />
-          </Component>
+                <Directory Id='ebcd2d7266' Name='ExternalAnnotations'>
+                  <Directory Id='cb7fd0b074' Name='xunit'>
 
-          <!--<Component Id="CustomDomain" Guid="5a4396a4-8eb0-41dc-aed6-880eff40163b">
-            <Condition><![CDATA[USECUSTOMDOMAIN = "1"]]></Condition>
-            <CreateFolder/>
-            <util:XmlFile Id="e8f8b9840a" Action="setValue" ElementPath="/xsl:stylesheet/xsl:template/xsl:variable[@name='host']/@select" File="[INSTALLDIR]Body.xslt" Value="'[CUSTOMDOMAIN]'"/>
-          </Component>-->
+                    <Component Id="Annotations" Guid="B12DD46D-750A-4925-8437-EE56B65C21CC">
+                      <File Id="c30ec0ffa7" Name="xunit.xml" DiskId="1" Source="..\lib\xunitnetcontrib\xunit.xml" Vital="yes" />
+                    </Component>
 
+                  </Directory>
+                </Directory>
+                
+              </Directory>
+            </Directory>
+          </Directory>
         </Directory>
-
       </Directory>
 
     </Directory>
 
-    <UIRef Id="WixUI_Common" />
-    <WixVariable Id="WixUICostingPopupOptOut" Value="1" Overridable="yes" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <UIRef Id="WixUI_FeatureTree" />
 
     <Icon Id="InstallerIcon" SourceFile="Resources\Installer.ico" />
     <Property Id="ARPPRODUCTICON" Value="InstallerIcon" />
 
-    <Feature Id='Complete' Level='1' ConfigurableDirectory='INSTALLDIR' Title='Go Notification Interceptor' Description='Installs the Go Notification Interceptor.'>
-      <ComponentRef Id='Application' />
+    <Feature Id='cb1ffc1cc4' Level='1' Title='xUnit.net Resharper Plugin' Description='Installs the xUnit.net Resharper Plugin for R# v$(var.ResharperVersion).'>
+      <ComponentRef Id='Plugin' />
+      <ComponentRef Id='Annotations' />
     </Feature>
 
   </Product>

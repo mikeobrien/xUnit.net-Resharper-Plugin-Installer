@@ -30,5 +30,10 @@ module Resharper
 		
 		return version
 	end
+	
+	def Resharper.CreateVersionFile(path, version)
+		Common.WriteAllFileText(path + "Resharper.ver", version) 
+		Common.WriteAllFileText(path + "ResharperMajor.ver", Common.GetMajorVersion(version)) 
+	end
 
 end
