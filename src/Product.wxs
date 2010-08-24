@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='Windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <Product
+    Name='xUnit.net Resharper Plugin'
+    UpgradeCode='4B28EA3C-383A-488A-9984-F6D22FDEF90B'
+    Id='59B96BB8-68C6-44A3-B13E-51C9B1A21645'
+    Language='1033'
+    Manufacturer='Ultraviolet Catastrophe'
+    Version='2.0'>
+
+    <Package
+        Keywords='Installer'
+			  Description="xUnit.net Resharper Plugin"
+			  Comments='xUnit.net Resharper Plugin'
+        Manufacturer='Ultraviolet Catastrophe'
+			  InstallerVersion='150'
+        Languages='1033'
+        Compressed='yes'
+        SummaryCodepage='1252' />
+
+    <Property Id="ALLUSERS">1</Property>
+
+    <Property Id="NET_FRAMEWORK_INSTALLED">
+      <RegistrySearch Id='bebd761663' Type='raw'
+			  Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5' Name='Install' />
+    </Property>
+
+    <Condition Message=".NET Framework 3.5 is not installed. Please install it and try again.">
+      Installed OR (NET_FRAMEWORK_INSTALLED = "#1" AND NOT Installed)
+    </Condition>
+
+    <Media Id='1' Cabinet='Installer.cab' EmbedCab='yes' />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='Program Files'>
+
+        <Directory Id='INSTALLDIR' Name='Go Notification Interceptor'>
+
+          <Component Id="Application" Guid="4E50BF9B-FD9F-4304-AF18-92075E6E913D">
+            <File Id="ad4b8f87aa" Name="GoNotificationInterceptor.exe" DiskId="1" Source="..\Service\bin\Release\GoNotificationInterceptor.exe" Vital="yes" />
+            <File Id="b1f17608c5" Name="GoNotificationInterceptor.exe.config" DiskId="1" Source="..\Service\bin\Release\GoNotificationInterceptor.exe.config" Vital="yes" />
+            <File Id="a7f92fdfd4" Name="cses.smtp.server.dll" DiskId="1" Source="..\Service\bin\Release\cses.smtp.server.dll" Vital="yes" />
+            <File Id="cc08c9a423" Name="log4net.dll" DiskId="1" Source="..\Service\bin\Release\log4net.dll" Vital="yes" />
+            <File Id="d584708c51" Name="Magnum.dll" DiskId="1" Source="..\Service\bin\Release\Magnum.dll" Vital="yes" />
+            <File Id="e000a805b4" Name="Topshelf.dll" DiskId="1" Source="..\Service\bin\Release\Topshelf.dll" Vital="yes" />
+            <File Id="d54429451a" Name="Subject.xslt" DiskId="1" Source="..\Service\bin\Release\Subject.xslt" Vital="yes" />
+            <File Id="cb4bc27988" Name="Body.xslt" DiskId="1" Source="..\Service\bin\Release\Body.xslt" Vital="yes" />
+
+            <util:XmlFile Id="b41d66a990" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@listenPort" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[LISTEN_PORT]"/>
+            <util:XmlFile Id="ca2e4aefda" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@smtpServer" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[SMTP_SERVER]"/>
+            <util:XmlFile Id="a4b9ff5ddf" Action="setValue" ElementPath="/configuration/goNotificationInterceptor/@smtpPort" File="[INSTALLDIR]GoNotificationInterceptor.exe.config" Value="[SMTP_PORT]"/>
+
+            <ServiceInstall Id="e04fabf81e"
+                            Arguments="service"
+                            Name="GoNotificationInterceptor"
+                            DisplayName="Go Notification Interceptor"
+                            Type="ownProcess"
+                            Start="auto"
+                            ErrorControl="normal"
+                            Description="ThoughtWorks Go Notification Interceptor" />
+            <ServiceControl Id="c4a4212412"
+                            Name="GoNotificationInterceptor"
+                            Start="install"
+                            Wait="no" />
+            <ServiceControl Id="cd78281127"
+                            Name="GoNotificationInterceptor"
+                            Stop="both"
+                            Wait="yes"
+                            Remove="uninstall" />
+          </Component>
+
+          <!--<Component Id="CustomDomain" Guid="5a4396a4-8eb0-41dc-aed6-880eff40163b">
+            <Condition><![CDATA[USECUSTOMDOMAIN = "1"]]></Condition>
+            <CreateFolder/>
+            <util:XmlFile Id="e8f8b9840a" Action="setValue" ElementPath="/xsl:stylesheet/xsl:template/xsl:variable[@name='host']/@select" File="[INSTALLDIR]Body.xslt" Value="'[CUSTOMDOMAIN]'"/>
+          </Component>-->
+
+        </Directory>
+
+      </Directory>
+
+    </Directory>
+
+    <UIRef Id="WixUI_Common" />
+    <WixVariable Id="WixUICostingPopupOptOut" Value="1" Overridable="yes" />
+
+    <Icon Id="InstallerIcon" SourceFile="Resources\Installer.ico" />
+    <Property Id="ARPPRODUCTICON" Value="InstallerIcon" />
+
+    <Feature Id='Complete' Level='1' ConfigurableDirectory='INSTALLDIR' Title='Go Notification Interceptor' Description='Installs the Go Notification Interceptor.'>
+      <ComponentRef Id='Application' />
+    </Feature>
+
+  </Product>
+
+</Wix>
