@@ -4,4 +4,4 @@ bin
 _ReSharper.*
 *.user
 *.suo
-temp
+Temp
