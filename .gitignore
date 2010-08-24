@@ -5,3 +5,5 @@ _ReSharper.*
 *.user
 *.suo
 Temp
+temp
+xunitnetcontrib

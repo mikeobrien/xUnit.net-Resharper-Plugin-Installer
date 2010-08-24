@@ -25,6 +25,12 @@ module Common
 		EnsurePath(path)
 	end
 
+	def Common.CopyFiles(source, target) 
+		Dir.glob(source) do |name|
+			FileUtils.cp(name, target)
+		end	
+	end
+
 	def Common.ReadAllFileText(path)
 	  data = ""
 	  file = File.open(path, "r") 
@@ -72,12 +78,6 @@ module Common
 
 	def Common.DownloadHgSource(url, path)
 		result = system("hg", "clone", "-r", "tip", url, path)
-	end
-	
-	MsBuildPath = "C:/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe"
-
-	def Common.MsBuild(path, config)
-		result = system(MsBuildPath, path, "/property:Configuration=#{config}")
 	end
 
 end

@@ -8,12 +8,24 @@ module XUnitContrib
 	SolutionPath = SourcePath + "xunitcontrib.sln"
 	XUnitContribSourceUrl = "https://hg01.codeplex.com/xunitcontrib"
 	ResharperPath = SourcePath + "3rdParty/ReSharper_v#{VersionToken}"
-	TestsPath = SourcePath + "resharper/tests.xunitcontrib.runner.resharper.runner.#{Resharper::VersionToken}/tests.xunitcontrib.runner.resharper.runner.#{Resharper::VersionToken}.dll"
+	TestsPath = SourcePath + "resharper/tests.xunitcontrib.runner.resharper.runner.#{VersionToken}/bin/release/tests.xunitcontrib.runner.resharper.runner.#{VersionToken}.dll"
 	ProjectRegex = /Project.*?EndProject/m
 	VersionRegex = /\"[\w\.]*xunitcontrib.runner.resharper[\w\.]*?\.(?<version>[\d\.]*)\"/
+	PluginPath = SourcePath + "resharper/xunitcontrib.runner.resharper.provider.#{VersionToken}/bin/Release/*.dll"
+	AnnotationsPath = SourcePath + "resharper/ExternalAnnotations/*.xml"
+	RunnerProjectPath = SourcePath + "resharper/xunitcontrib.runner.resharper.runner.#{VersionToken}/xunitcontrib.runner.resharper.runner.#{VersionToken}.csproj"
+	ProviderProjectPath = SourcePath + "resharper/xunitcontrib.runner.resharper.provider.#{VersionToken}/xunitcontrib.runner.resharper.provider.#{VersionToken}.csproj"
+
+	def XUnitContrib.GetPluginPath(path)
+		return path + PluginPath.gsub(VersionToken, GetLatestSupportedVersion(path))
+	end
 
 	def XUnitContrib.GetResharperLibPath(path)
-		return ResharperPath.gsub(VersionToken, GetLatestSupportedVersion(path))
+		return path + ResharperPath.gsub(VersionToken, GetLatestSupportedVersion(path))
+	end
+
+	def XUnitContrib.GetResharperTestsPath(path)
+		return path + TestsPath.gsub(VersionToken, GetLatestSupportedVersion(path))
 	end
 
 	def XUnitContrib.GetLatestSupportedVersion(path)
@@ -56,17 +68,29 @@ module XUnitContrib
 		Common.WriteAllFileText(path + SolutionPath, solution)
 	end
 
+	def XUnitContrib.MakeAssemblyNamesVersionNeutral(path)
+		
+		latestVersion = XUnitContrib.GetLatestSupportedVersion(path)
+
+		runnerProject = Common.ReadAllFileText(path + RunnerProjectPath.gsub(VersionToken, latestVersion))
+		providerProject = Common.ReadAllFileText(path + ProviderProjectPath.gsub(VersionToken, latestVersion))
+		
+		oldRunnerAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.runner.#{latestVersion}</AssemblyName>"
+		oldProviderAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.provider.#{latestVersion}</AssemblyName>"
+		
+		newRunnerAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.runner</AssemblyName>"
+		newProviderAssemblyName = "<AssemblyName>xunitcontrib.runner.resharper.provider</AssemblyName>"
+		
+		runnerProject = runnerProject.gsub(oldRunnerAssemblyName, newRunnerAssemblyName)
+		providerProject = providerProject.gsub(oldProviderAssemblyName, newProviderAssemblyName)
+		
+		Common.WriteAllFileText(path + RunnerProjectPath.gsub(VersionToken, latestVersion), runnerProject)
+		Common.WriteAllFileText(path + ProviderProjectPath.gsub(VersionToken, latestVersion), providerProject)
+	end
+
 	def XUnitContrib.DownloadSource(path)
 		Common.CleanPath(path + SourcePath)
 		Common.DownloadHgSource(XUnitContribSourceUrl, path + SourcePath)
-	end
-
-	def XUnitContrib.BuildSolution(path)
-		Common.MsBuild(path + SolutionPath, "Release")
-	end
-
-	def XUnitContrib.RunTests(path)
-		Common.MsBuild(path + SolutionPath, "Release")
 	end
 
 end
