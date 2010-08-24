@@ -19,7 +19,6 @@ task :init do
 	ResharperMajorVersion = Common.GetMajorVersion(ResharperVersion)
 	XUnitContrib.DereferenceUnnecessaryPluginProjects(TempFolder)
 	XUnitContrib.MakeAssemblyNamesVersionNeutral(TempFolder)
-	Resharper.CreateVersionFile(TempFolder, ResharperMajorVersion)
 end
 
 msbuild :buildXunitContrib => :init do |msb|
